@@ -157,7 +157,7 @@ bool isValidCommand(char* currentCommand)
 }
 bool isValidCoordinate(int number, size_t size)
 {
-	return number > 0 && number < (size - 1);
+	return number >= 0 && number <= (size - 1);
 }
 void getValidCordinates(int& rowCoordinate, int& collCordinate, size_t size)
 {
@@ -169,13 +169,73 @@ void getValidCordinates(int& rowCoordinate, int& collCordinate, size_t size)
 			cin >> rowCoordinate >> collCordinate;
 	}
 }
+void openAllZeroes(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], 
+					int currentRow, int currentColl, size_t size, unsigned mines)
+{
+
+}
+void playMark(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], 
+				unsigned mines, int currentRow, int currentColl )
+{
+	if (gameField[currentRow][currentColl] == '#') 
+	{
+		cout << "This cell is already marked!" << endl;
+	}
+	else  if(gameField[currentRow][currentColl] == ' ')
+	{
+		gameField[currentRow][currentColl] = '#';
+	}
+	else
+	{
+		cout << "This cell is opened! " << endl;
+	}
+}
+void playUnmark(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], 
+					unsigned mines, int currentRow, int currentColl)
+{
+	if (gameField[currentRow][currentColl] == '#') 
+	{
+		gameField[currentRow][currentColl] = ' ';
+		cout << "This cell is not marked!" << endl;
+	}
+	else if(gameField[currentRow][currentColl] != '#')
+	{
+		cout << "This cell is not marked!" << endl;
+	}
+}
+void playOpen(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], 
+			  size_t size, unsigned mines, int currentRow, int currentColl, bool& game)
+{
+	if (minesField[currentRow][currentColl] == '*') {
+		printField(minesField, size);
+		cout << "Game Over! You hit a mine."<<endl;
+		game = false;
+		
+	}
+	else if (gameField[currentRow][currentColl] == '#')
+	{
+		cout << "This cell is already marked. " << endl;
+	}
+	else if (gameField[currentRow][currentColl] != ' ')
+	{
+		cout << "Cell has already been opened! " << endl;
+	}
+	else if(minesField[currentRow][currentColl]!='0')
+	{
+		gameField[currentRow][currentColl] = minesField[currentRow][currentColl];
+	}
+	else if(minesField[currentRow][currentColl] == '0')
+	{
+		openAllZeroes(gameField, minesField, currentRow, currentColl, size, mines);
+	}
+}
 void playCommand(char* currentCommand, char gameField[SIZE][SIZE],
-	char minesField[SIZE][SIZE], size_t size, unsigned mines,
-	int currentRow, int currentColl)
+				 char minesField[SIZE][SIZE], size_t size, unsigned mines,
+				 int currentRow, int currentColl, bool& game)
 {
 	if (myStrcmp(currentCommand, "open") == 0)
 	{
-		playOpen(gameField, minesField, size, currentRow, currentColl);
+		playOpen(gameField, minesField, size, mines, currentRow, currentColl, game);
 	}
 	else if (myStrcmp(currentCommand, "mark") == 0)
 	{
@@ -189,6 +249,7 @@ void playCommand(char* currentCommand, char gameField[SIZE][SIZE],
 
 void play(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], size_t size, unsigned mines)
 {
+	bool game = 1;
 	do
 	{
 		char currentCommand[7];
@@ -198,14 +259,18 @@ void play(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], size_t size, 
 		{
 			int currentRow, currentColl;
 			getValidCordinates(currentRow, currentColl, size);
-			playCommand(currentCommand, gameField, minesField, size, mines);
+			playCommand(currentCommand, gameField, minesField, size, mines,currentRow,currentColl,game);
+			if (game == 0)
+			{
+				break;
+			}
 			printField(gameField, size);
 		}
 		else
 		{
 			cout << "Incorrect input! Try again." << endl;
 		}
-	} while (true);
+	} while (game);
 	
 	
 }
@@ -220,6 +285,7 @@ int main()
 	init(fieldWithMines, ' ');
 	placeMines(fieldWithMines, size, mines);
 	findCountOfMinesAround(fieldWithMines, size);
+	printField(fieldWithMines, size);
 	printField(gameField, size);
 	play(gameField, fieldWithMines,size, mines);
 	return 0;
