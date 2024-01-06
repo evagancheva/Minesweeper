@@ -89,7 +89,7 @@ void generateValidCordinatesForMine(char field[SIZE][SIZE], int& row, int& coll,
 		}
 		field[row][coll] = '*';
 }
-void generateMines(char field[SIZE][SIZE], size_t size, unsigned mines)
+void placeMines(char field[SIZE][SIZE], size_t size, unsigned mines)
 {
 	srand(time(0));
 	for (int i = 1; i <= mines; i++) 
@@ -99,11 +99,15 @@ void generateMines(char field[SIZE][SIZE], size_t size, unsigned mines)
 	}
 
 }
-void getCountInCell(char field[SIZE][SIZE], size_t size, int x, int y)
+int getCountInCell(char field[SIZE][SIZE], size_t size, int x, int y)
 {
 	char count = '0';
+	if (x >= 0 && y >= 0 && x < size && y < size)
+	{ 
 	for (int i = x - 1; i <= x + 1; i++)
 	{
+		if (i >= 0  && i < size )
+		{ 
 		for (int j = y - 1; j <= y + 1; j++)
 		{
 			if (i >= 0 && j >= 0 && i < size && j < size)
@@ -114,8 +118,10 @@ void getCountInCell(char field[SIZE][SIZE], size_t size, int x, int y)
 					count++;
 			}
 		}
+		}
 	}
-	field[x][y] = count;
+	}
+	return count;
 }
 void findCountOfMinesAround(char field[SIZE][SIZE], size_t size)
 {
@@ -124,9 +130,84 @@ void findCountOfMinesAround(char field[SIZE][SIZE], size_t size)
 		for (int j = 0; j < size; j++)
 		{
 			if (field[i][j] != '*')
-				getCountInCell(field, size, i, j);
+				field[i][j]=getCountInCell(field, size, i, j);
 		}
 	}
+}
+int myStrcmp(const char* first, const char* second)
+{
+	if (!first  ||! second )
+		return -1;
+	while ((*first) && (*second) && ((*first) == (*second)))
+	{
+		first++;
+		second++;
+	}
+	if (*first == '\0' && *second == '\0')
+		return 0;
+	return *first == '\0' ? -1 : 1;
+}
+bool isValidCommand(char* currentCommand)
+{
+	return (myStrcmp(currentCommand, "open") == 0 ||
+		myStrcmp(currentCommand, "mark") == 0 ||
+		myStrcmp(currentCommand, "unmark") == 0);
+	
+	
+}
+bool isValidCoordinate(int number, size_t size)
+{
+	return number > 0 && number < (size - 1);
+}
+void getValidCordinates(int& rowCoordinate, int& collCordinate, size_t size)
+{
+	cout << "Please enter coordinates of cell: " << endl;
+	cin >> rowCoordinate >> collCordinate;
+	while (!isValidCoordinate(rowCoordinate, size)|| !isValidCoordinate(rowCoordinate, size))
+	{
+			cout << "Please, enter valid cordinates from 0 to " << (size - 1) << endl;
+			cin >> rowCoordinate >> collCordinate;
+	}
+}
+void playCommand(char* currentCommand, char gameField[SIZE][SIZE],
+	char minesField[SIZE][SIZE], size_t size, unsigned mines,
+	int currentRow, int currentColl)
+{
+	if (myStrcmp(currentCommand, "open") == 0)
+	{
+		playOpen(gameField, minesField, size, currentRow, currentColl);
+	}
+	else if (myStrcmp(currentCommand, "mark") == 0)
+	{
+		playMark(gameField, minesField,  mines, currentRow, currentColl);
+	}
+	else if (myStrcmp(currentCommand, "unmark") == 0)
+	{
+		playUnmark(gameField, minesField,  mines, currentRow, currentColl);
+	}
+}
+
+void play(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], size_t size, unsigned mines)
+{
+	do
+	{
+		char currentCommand[7];
+		cout << "Plese choose open, mark or unmark:" << endl;
+		cin >> currentCommand;
+		if (isValidCommand(currentCommand))
+		{
+			int currentRow, currentColl;
+			getValidCordinates(currentRow, currentColl, size);
+			playCommand(currentCommand, gameField, minesField, size, mines);
+			printField(gameField, size);
+		}
+		else
+		{
+			cout << "Incorrect input! Try again." << endl;
+		}
+	} while (true);
+	
+	
 }
 int main()
 {
@@ -137,10 +218,12 @@ int main()
 	char fieldWithMines[SIZE][SIZE];
 	init(gameField, ' ');
 	init(fieldWithMines, ' ');
-	generateMines(fieldWithMines, size, mines);
+	placeMines(fieldWithMines, size, mines);
 	findCountOfMinesAround(fieldWithMines, size);
-	printField(fieldWithMines, size);
 	printField(gameField, size);
+	play(gameField, fieldWithMines,size, mines);
+	return 0;
+	
 
 }
 
