@@ -152,7 +152,7 @@ int myStrcmp(const char* first, const char* second)
 		return 0;
 	return *first == '\0' ? -1 : 1;
 }
-bool isValidCommand(char* currentCommand)
+bool isValidCommand(const char* currentCommand)
 {
 	return (myStrcmp(currentCommand, "open") == 0 ||
 		myStrcmp(currentCommand, "mark") == 0 ||
@@ -259,7 +259,7 @@ void playOpen(char gameField[][SIZE], char minesField[][SIZE],
 		openAllZeroes(gameField, minesField, currentRow, currentColl, size, counOfFreeCells);
 	}
 }
-void playCommand(char* currentCommand, char gameField[][SIZE],
+void playCommand(const char* currentCommand, char gameField[][SIZE],
 				 char minesField[][SIZE], size_t size, int& mines,
 				 int currentRow, int currentColl, bool& game, int& counOfFreeCells)
 {
