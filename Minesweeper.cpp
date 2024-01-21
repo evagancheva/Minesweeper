@@ -1,3 +1,17 @@
+﻿/**
+*
+* Solution to course project # 5
+* Introduction to programming course
+* Faculty of Mathematics and Informatics of Sofia University
+* Winter semester 2023/2024
+*
+* @author Eva Gancheva
+* @idnumber 6MI0600300
+* @compiler VC
+*
+* 
+*
+*/
 
 
 #include <iostream>
@@ -34,7 +48,7 @@ void createValidGame(size_t& size, int& numOfMines)
 	cout << endl;
 
 }
-void init(char field [SIZE][SIZE], char symbol)
+void init(char field [][SIZE], char symbol)
 {
 	for (int i = 0; i < SIZE; i++)
 	{
@@ -51,7 +65,7 @@ void printNumbersOfColls(size_t size)
 	}
 	cout << endl;
 }
-void printField(const char field[SIZE][SIZE], size_t size, int mines)
+void printField(const char field[][SIZE], size_t size, int mines)
 {
 	printNumbersOfColls(size);
 	for (int i = 0; i < size; i++)
@@ -66,31 +80,21 @@ void printField(const char field[SIZE][SIZE], size_t size, int mines)
 	cout << endl;
 	cout << "Remaning mines to mark: " << mines << endl;
 }
-void generateCordinates(int& row, int& coll, size_t size)
-{
-	do
-	{
-		row = rand() % 10;
-	} while (row >= size);
-	do
-	{
-		coll = rand() % 10;
-	} while (coll >= size);
-	
-}
 bool isMarked(char symbol)
 {
 	return symbol == '*';
 }
-void generateValidCordinatesForMine(char field[SIZE][SIZE], int& row, int& coll, size_t size)
+void generateValidCordinatesForMine(char field[][SIZE], int& row, int& coll, size_t size)
 {
-		while(isMarked(field[row][coll]))
+		row = rand() % size;
+		coll = rand() % size;
+		if(isMarked(field[row][coll]))
 		{
-			generateCordinates(row, coll, size);
+			generateValidCordinatesForMine(field, row, coll, size);
 		}
 		field[row][coll] = '*';
 }
-void placeMines(char field[SIZE][SIZE], size_t size, int mines)
+void placeMines(char field[][SIZE], size_t size, int mines)
 {
 	srand(time(0));
 	for (int i = 1; i <= mines; i++) 
@@ -100,7 +104,7 @@ void placeMines(char field[SIZE][SIZE], size_t size, int mines)
 	}
 
 }
-int getCountInCell(char field[SIZE][SIZE], size_t size, int x, int y)
+int getCountInCell(char field[][SIZE], size_t size, int x, int y)
 {
 	char count = '0';
 	if (x >= 0 && y >= 0 && x < size && y < size)
@@ -124,7 +128,7 @@ int getCountInCell(char field[SIZE][SIZE], size_t size, int x, int y)
 	}
 	return count;
 }
-void findCountOfMinesAround(char field[SIZE][SIZE], size_t size)
+void findCountOfMinesAround(char field[][SIZE], size_t size)
 {
 	for (int i = 0; i < size; i++)
 	{
@@ -170,7 +174,7 @@ void getValidCordinates(int& rowCoordinate, int& collCordinate, size_t size)
 			cin >> rowCoordinate >> collCordinate;
 	}
 }
-void openAllZeroes(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], 
+void openAllZeroes(char gameField[][SIZE], char minesField[][SIZE], 
 					int currentRow, int currentColl, size_t size, int& counOfFreeCells)
 {
 	for (int i = currentRow - 1; i <= currentRow + 1; i++)
@@ -198,7 +202,7 @@ void openAllZeroes(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE],
 		}
 	}
 }
-void playMark(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], 
+void playMark(char gameField[][SIZE], char minesField[][SIZE], 
 				 int currentRow, int currentColl,  int& mines)
 {
 	if (gameField[currentRow][currentColl] == '#') 
@@ -215,7 +219,7 @@ void playMark(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE],
 		cout << "This cell is opened! " << endl;
 	}
 }
-void playUnmark(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], 
+void playUnmark(char gameField[][SIZE], char minesField[][SIZE], 
 					 int currentRow, int currentColl)
 {
 	if (gameField[currentRow][currentColl] == '#') 
@@ -228,7 +232,7 @@ void playUnmark(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE],
 		cout << "This cell is not marked!" << endl;
 	}
 }
-void playOpen(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], 
+void playOpen(char gameField[][SIZE], char minesField[][SIZE], 
 			  size_t size, int currentRow, int currentColl, bool& game, int& counOfFreeCells, int mines)
 {
 	if (minesField[currentRow][currentColl] == '*') {
@@ -255,8 +259,8 @@ void playOpen(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE],
 		openAllZeroes(gameField, minesField, currentRow, currentColl, size, counOfFreeCells);
 	}
 }
-void playCommand(char* currentCommand, char gameField[SIZE][SIZE],
-				 char minesField[SIZE][SIZE], size_t size, int& mines,
+void playCommand(char* currentCommand, char gameField[][SIZE],
+				 char minesField[][SIZE], size_t size, int& mines,
 				 int currentRow, int currentColl, bool& game, int& counOfFreeCells)
 {
 	if (myStrcmp(currentCommand, "open") == 0)
@@ -276,7 +280,7 @@ bool isGameWon(int counOfFreeCells, int mines)
 {
 	return counOfFreeCells == 0&& mines==0;
 }
-void play(char gameField[SIZE][SIZE], char minesField[SIZE][SIZE], size_t size, int& mines)
+void play(char gameField[][SIZE], char minesField[][SIZE], size_t size, int& mines)
 {
 	int counOfFreeCells = size * size - mines;
 	bool game = 1;
